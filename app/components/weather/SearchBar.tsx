@@ -24,7 +24,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
       try {
         const cities = await getPopularCities(20);
         setPopularCities(cities);
-      } catch (error) {
+      } catch {
         // Silently handle errors
       }
     };
@@ -45,7 +45,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
           const results = await searchCities(city.trim());
           setSuggestions(results);
           setShowSuggestions(results.length > 0);
-        } catch (error) {
+        } catch {
           // If API fails, try to filter from popular cities
           const filteredCities = popularCities.filter(
             c => c.toLowerCase().includes(city.toLowerCase())

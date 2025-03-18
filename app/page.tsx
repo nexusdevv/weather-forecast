@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import WeatherCard from './components/weather/WeatherCard';
 import ForecastSlider from './components/weather/ForecastSlider';
 import SearchBar from './components/weather/SearchBar';
@@ -9,7 +9,6 @@ import FadeIn from './components/animations/FadeIn';
 import { getCurrentWeather, getForecast, WeatherData, DayForecast, WeatherError } from './services/weatherService';
 
 export default function Home() {
-  const [city, setCity] = useState<string | null>(null);
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
   const [pastDays, setPastDays] = useState<DayForecast[]>([]);
   const [futureDays, setFutureDays] = useState<DayForecast[]>([]);
@@ -47,7 +46,6 @@ export default function Home() {
   };
 
   const handleSearch = (cityName: string) => {
-    setCity(cityName);
     fetchWeatherData(cityName);
   };
 

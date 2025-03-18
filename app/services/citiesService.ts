@@ -10,6 +10,15 @@ export interface City {
   population?: number;
 }
 
+// For API responses
+interface GeoCityData {
+  id: number;
+  city: string;
+  country: string;
+  population?: number;
+  [key: string]: unknown;
+}
+
 // Cache mechanism to avoid repeated API calls
 let cachedPopularCities: City[] | null = null;
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
@@ -49,8 +58,8 @@ export async function getPopularCities(limit: number = 30): Promise<string[]> {
     const data = await response.json();
     
     if (data && data.data && Array.isArray(data.data)) {
-      cachedPopularCities = data.data.map((city: any) => ({
-        id: city.id,
+      cachedPopularCities = data.data.map((city: GeoCityData) => ({
+        id: String(city.id),
         name: city.city,
         country: city.country,
         population: city.population
@@ -62,7 +71,7 @@ export async function getPopularCities(limit: number = 30): Promise<string[]> {
     }
     
     return getFallbackCities();
-  } catch (error) {
+  } catch {
     return getFallbackCities();
   }
 }
@@ -113,7 +122,7 @@ export async function searchCities(query: string, limit: number = 10): Promise<s
     const data = await response.json();
     
     if (data && data.data && Array.isArray(data.data)) {
-      const results = data.data.map((city: any) => city.city);
+      const results = data.data.map((city: GeoCityData) => city.city);
       
       searchCache[cacheKey] = {
         results,
@@ -125,7 +134,7 @@ export async function searchCities(query: string, limit: number = 10): Promise<s
     
     // Fallback to fuzzy search in our local cities list
     return fuzzySearchFallbackCities(query, limit);
-  } catch (error) {
+  } catch {
     // Fallback to fuzzy search in our local cities list
     return fuzzySearchFallbackCities(query, limit);
   }
