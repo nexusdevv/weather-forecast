@@ -1,103 +1,114 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import WeatherCard from './components/weather/WeatherCard';
+import ForecastSlider from './components/weather/ForecastSlider';
+import SearchBar from './components/weather/SearchBar';
+import BlurIn from './components/animations/BlurIn';
+import FadeIn from './components/animations/FadeIn';
+import { getCurrentWeather, getForecast, WeatherData, DayForecast, WeatherError } from './services/weatherService';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [city, setCity] = useState<string | null>(null);
+  const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
+  const [pastDays, setPastDays] = useState<DayForecast[]>([]);
+  const [futureDays, setFutureDays] = useState<DayForecast[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<{message: string, isInvalidCity: boolean} | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const fetchWeatherData = async (cityName: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const weatherData = await getCurrentWeather(cityName);
+      const forecastData = await getForecast(cityName);
+      
+      setCurrentWeather(weatherData);
+      setPastDays(forecastData.pastDays);
+      setFutureDays(forecastData.futureDays);
+      setHasSearched(true);
+    } catch (err) {
+      if (err instanceof WeatherError) {
+        setError({
+          message: err.message,
+          isInvalidCity: err.isInvalidCity
+        });
+      } else {
+        setError({
+          message: 'An error occurred. Please try again later.',
+          isInvalidCity: false
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (cityName: string) => {
+    setCity(cityName);
+    fetchWeatherData(cityName);
+  };
+
+  return (
+    <main className="min-h-screen bg-black text-white overflow-hidden">
+      <div className="weather-gradient min-h-screen">
+        <div className="container mx-auto px-4 py-10">
+          <div className={`flex flex-col items-center justify-center transition-all duration-700 ease-in-out ${hasSearched ? 'mt-4' : 'min-h-[80vh]'}`}>
+            <BlurIn className={`${hasSearched ? 'mb-8' : 'mb-12'} text-center`}>
+              <h1 onClick={() => window.location.reload()} className="text-4xl font-light tracking-tight mb-1 cursor-pointer hover:text-zinc-300 transition-all">Weather <span className="font-bold">Forecast</span></h1>
+              <p className="text-zinc-400 text-sm max-w-md mx-auto">Real-time weather data with beautiful minimalist black & white design</p>
+            </BlurIn>
+            
+            <SearchBar onSearch={handleSearch} />
+            
+            {error && (
+              <BlurIn className="w-full max-w-md mb-8">
+                <div className="p-5 rounded-2xl backdrop-blur-md bg-amber-900/20 border border-amber-800/30 text-amber-200">
+                  <div className="flex items-center gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span className="font-medium">{error.message}</span>
+                  </div>
+                </div>
+              </BlurIn>
+            )}
+            
+            {hasSearched && (
+              <div className="flex flex-col items-center justify-center max-w-4xl mx-auto w-full">
+                {loading ? (
+                  <div className="flex items-center justify-center h-64">
+                    <div className="animate-pulse-slow">
+                      <svg className="w-12 h-12 text-white opacity-75" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                ) : currentWeather && (
+                  <FadeIn className="w-full" delay={0.2}>
+                    <div className="mb-16">
+                      <WeatherCard currentWeather={currentWeather} />
+                    </div>
+                    
+                    <ForecastSlider pastDays={pastDays} futureDays={futureDays} />
+                  </FadeIn>
+                )}
+              </div>
+            )}
+          </div>
+          
+          <footer className="mt-24 text-center text-zinc-500 text-sm">
+            <FadeIn delay={0.6}>
+              <p>© {new Date().getFullYear()} Weather Forecast App by <a href="https://github.com/nexusdevv" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-300 text-zinc-100 transition-colors hover:underline">Nexus</a></p>
+            </FadeIn>
+          </footer>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }
