@@ -2,7 +2,7 @@
 
 A modern, minimalist weather forecast application built with Next.js and TypeScript that provides real-time weather information with a sleek black and white design. This application allows users to search for cities worldwide and get current weather conditions as well as 5-day forecasts.
 
-![Weather Forecast App Screenshot](https://your-screenshot-url-here.png)
+![Weather Forecast App Screenshot](https://i.ibb.co/0yhYT2q0/Ekran-g-r-nt-s-2025-03-19-161204.png)
 
 ## Features
 
@@ -17,7 +17,7 @@ A modern, minimalist weather forecast application built with Next.js and TypeScr
 
 ## Live Demo
 
-[View Live Demo](https://your-demo-url-here.vercel.app)
+[View Live Demo](https://weatherforecastpro.vercel.app)
 
 ## Getting Started
 
@@ -31,8 +31,8 @@ A modern, minimalist weather forecast application built with Next.js and TypeScr
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/weather-forecast-app.git
-cd weather-forecast-app
+git clone https://github.com/nexusdevv/weather-forecast.git
+cd weather-forecast
 ```
 
 2. Install dependencies:
@@ -144,4 +144,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-Created with ❤️ by [Your Name](https://github.com/yourusername)
+Created with Next.js by [Nexus](https://github.com/nexusdevv)
