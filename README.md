@@ -2,7 +2,7 @@
 
 A modern, minimalist weather forecast application built with Next.js and TypeScript that provides real-time weather information with a sleek black and white design. This application allows users to search for cities worldwide and get current weather conditions as well as 5-day forecasts.
 
-![Weather Forecast App Screenshot](https://i.ibb.co/0yhYT2q0/Ekran-g-r-nt-s-2025-03-19-161204.png)
+![Weather Forecast App Screenshot](https://i.imgur.com/au6lBzG.png)
 
 ## Features
 
